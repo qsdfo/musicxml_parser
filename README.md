@@ -15,9 +15,9 @@ Written in python 2.7
 * os, re, json, sys
 
 ## Files
-### mxml_parser :
-Main function which parse each file in a given database and save the data in
-### scoreToPianoroll.py :
-Build the three matrices. Implements open, close and content fonctions for a SAX parser
-### totalLengthHandler.py :
-Small SAX parser to get the total length in number of quarter notes of a score
+The main function is ScoreToPianoroll in ScoreToPianoroll.py
+It takes as input the path to a MusicXML file and output two python dictionnary of the form :
+
+    {'track_name' : matrix}
+
+where matrix is two-dimensional, first axis begin the time, second the pitch.
