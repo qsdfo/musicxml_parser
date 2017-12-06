@@ -16,7 +16,6 @@
 #
 
 import numpy as np
-import sys
 import xml.sax
 import re
 from smooth_dynamic import smooth_dyn
@@ -46,15 +45,14 @@ mapping_dyn_number = {
 
 
 class ScoreToPianorollHandler(xml.sax.ContentHandler):
-    def __init__(self, division, instru_dict, total_length, number_pitches=128, discard_grace=False):
+    def __init__(self, division, total_length, number_pitches=128, discard_grace=False):
         self.CurrentElement = u""
         # Instrument
         self.number_pitches = number_pitches
-        self.instru_dict = instru_dict
         self.identifier = u""                # Current identifier
-        self.part_instru_mapping = {}       # Mapping between parts in the parsed score,
         # and instrument name in the produced pianoroll
         self.content = u""
+        self.part_instru_mapping = {}
 
         # Measure informations
         self.time = 0              # time counter
@@ -295,37 +293,9 @@ class ScoreToPianorollHandler(xml.sax.ContentHandler):
                 raise NameError("XML Duration not set for a forward")
             self.time += self.duration
             self.duration_set = False
-
+            
         if tag == u'part-name':
-            part_name = self.content
-            is_found_instru = False
-            # find the name in our dictionnary
-            for instru_name, set_name in self.instru_dict.iteritems():
-                # Match by regular expression
-                if search_re_list(part_name, set_name):
-                    # Check if part name match any of the value in set_name
-                    this_instru_name = instru_name
-                    is_found_instru = True
-                    break
-
-            if not is_found_instru:
-                print '\n______________________________________'
-                print (u'Enter an instrument name for the part name ' + part_name).encode('utf8')
-                print '(Be careful to use the same name as those shown before if this instrument already exists)\n'
-                print '\n'.join(self.instru_dict.keys())
-                print '______________________________________'
-                # Get the name of the instrument
-                this_instru_name = raw_input().decode(sys.stdin.encoding)
-
-                print 'Enter an associated regular expression :'
-                print '______________________________________\n'
-                re_instru = raw_input().decode(sys.stdin.encoding)
-                # Add the name of the part to the list corresponding to this instrument in the dictionary
-                if this_instru_name in self.instru_dict.keys():
-                    self.instru_dict[this_instru_name].append(re_instru)
-                else:
-                    self.instru_dict[this_instru_name] = [re_instru]
-
+            this_instru_name = self.content
             print (u"@@ " + self.content + u"   :   " + this_instru_name).encode('utf8')
             self.content = u""
             self.part_instru_mapping[self.identifier] = this_instru_name
@@ -342,11 +312,8 @@ class ScoreToPianorollHandler(xml.sax.ContentHandler):
             else:
                 self.pianoroll[instru] = np.transpose(np.multiply(np.transpose(self.pianoroll_local), dynamics))
                 self.articulation[instru] = np.transpose(np.multiply(np.transpose(self.articulation_local), dynamics))
-        ####################################################################
-
-        ####################################################################
-        ####################################################################
-        ####################################################################
+        return
+        
     def characters(self, content):
         # Avoid breaklines and whitespaces
         if content.strip():
@@ -384,7 +351,7 @@ class ScoreToPianorollHandler(xml.sax.ContentHandler):
                 self.voice_set = True
 
             if self.CurrentElement == u"part-name":
-                self.content += u" " + content
+                self.content += content
 
             ############################################################
             # Directions
@@ -401,7 +368,8 @@ class ScoreToPianorollHandler(xml.sax.ContentHandler):
                         self.dynamics[t_start:t_end] = np.linspace(start_dyn, max(start_dyn + 0.1, 1), t_end - t_start)
                     if is_dim:
                         self.dynamics[t_start:t_end] = np.linspace(start_dyn, min(start_dyn - 0.1, 0), t_end - t_start)
-
+        return
+        
 
 def search_re_list(string, expression):
     for value in expression:
@@ -425,14 +393,11 @@ def ScoreToPianoroll(score_path, quantization):
     # Now parse the file and get the pianoroll, articulation and dynamics
     parser = xml.sax.make_parser()
     parser.setFeature(xml.sax.handler.feature_namespaces, 0)
-    Handler_score = ScoreToPianorollHandler(quantization, instru_dict, total_length, pitch_per_instrument, False)
+    Handler_score = ScoreToPianorollHandler(quantization, total_length)
     parser.setContentHandler(Handler_score)
     parser.parse(score_path)
 
     # Using Mapping, build concatenated along time and pitch pianoroll
-    track_length = total_length * quantization
-    start_t = 0
-    end_t = track_length
     pianoroll = {}
     articulation = {}
     for instru_name, mat in Handler_score.pianoroll.iteritems():
@@ -443,23 +408,6 @@ def ScoreToPianoroll(score_path, quantization):
     return pianoroll, articulation
 
 if __name__ == '__main__':
-    
-    import json
-
-    with open('dict_test.json') as f:
-        instru_dict = json.load(f)
-
-    # Get the total length in quarter notes of the track
-    pre_parser = xml.sax.make_parser()
-    pre_parser.setFeature(xml.sax.handler.feature_namespaces, 0)
-    Handler_length = TotalLengthHandler()
-    pre_parser.setContentHandler(Handler_length)
-    pre_parser.parse('test.xml')
-    total_length = Handler_length.total_length
-
-    # Now parse the file and get the pianoroll, articulation and dynamics
-    parser = xml.sax.make_parser()
-    parser.setFeature(xml.sax.handler.feature_namespaces, 0)
-    Handler_score = ScoreToPianorollHandler(4, instru_dict, total_length)
-    parser.setContentHandler(Handler_score)
-    parser.parse('test.xml')
+    score_path = "test.xml"
+    quantization = 8
+    pianoroll, articulation = ScoreToPianoroll(score_path, quantization)
