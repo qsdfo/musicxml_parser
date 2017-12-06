@@ -18,6 +18,8 @@
 import numpy as np
 import xml.sax
 import re
+import os
+import shutil
 from smooth_dynamic import smooth_dyn
 from totalLengthHandler import TotalLengthHandler
 
@@ -379,13 +381,34 @@ def search_re_list(string, expression):
     return False
 
 
+def pre_process_file(file_path, tmp_name='jsodfijosid.xml'):
+    """Simply consists in removing the DOCTYPE that make the xml parser crash
+    
+    """
+    temp_file_path = re.sub(r'/?.*$', tmp_name, file_path)
+    
+    # Remove the doctype line
+    open(temp_file_path, 'wb').close()
+    with open(file_path, 'rb') as fread:
+        for line in fread:
+            if not re.search(r'<!DOCTYPE', line):
+                with open(temp_file_path, 'ab') as fwrite:
+                    fwrite.write(line)                
+               
+    # Return the new path
+    return temp_file_path
+
+    
 def ScoreToPianoroll(score_path, quantization):
+    # Remove DOCTYPE
+    tmp_file_path = pre_process_file(score_path)
+    
     # Get the total length in quarter notes of the track
     pre_parser = xml.sax.make_parser()
     pre_parser.setFeature(xml.sax.handler.feature_namespaces, 0)
     Handler_length = TotalLengthHandler()
     pre_parser.setContentHandler(Handler_length)
-    pre_parser.parse(score_path)
+    pre_parser.parse(tmp_file_path)
     total_length = Handler_length.total_length
     # Float number
     total_length = int(total_length)
@@ -395,7 +418,7 @@ def ScoreToPianoroll(score_path, quantization):
     parser.setFeature(xml.sax.handler.feature_namespaces, 0)
     Handler_score = ScoreToPianorollHandler(quantization, total_length)
     parser.setContentHandler(Handler_score)
-    parser.parse(score_path)
+    parser.parse(tmp_file_path)
 
     # Using Mapping, build concatenated along time and pitch pianoroll
     pianoroll = {}
@@ -405,6 +428,7 @@ def ScoreToPianoroll(score_path, quantization):
     for instru_name, mat in Handler_score.articulation.iteritems():
         articulation[instru_name] = mat
     
+    os.remove(tmp_file_path)
     return pianoroll, articulation
 
 if __name__ == '__main__':
