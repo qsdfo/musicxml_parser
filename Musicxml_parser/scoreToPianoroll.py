@@ -19,7 +19,7 @@ import numpy as np
 import xml.sax
 import re
 import os
-import shutil
+import tempfile
 from smooth_dynamic import smooth_dyn
 from totalLengthHandler import TotalLengthHandler
 
@@ -381,20 +381,21 @@ def search_re_list(string, expression):
     return False
 
 
-def pre_process_file(file_path, tmp_name='jsodfijosid.xml'):
+def pre_process_file(file_path):
     """Simply consists in removing the DOCTYPE that make the xml parser crash
     
     """
-    temp_file_path = re.sub(r'/?.*$', tmp_name, file_path)
+
+    temp_file = tempfile.NamedTemporaryFile('wb',suffix='.xml', prefix='tmp', delete=False)
     
     # Remove the doctype line
-    open(temp_file_path, 'wb').close()
     with open(file_path, 'rb') as fread:
         for line in fread:
             if not re.search(r'<!DOCTYPE', line):
-                with open(temp_file_path, 'ab') as fwrite:
-                    fwrite.write(line)                
-               
+                temp_file.write(line)                
+    temp_file_path = temp_file.name
+    temp_file.close()
+    
     # Return the new path
     return temp_file_path
 
@@ -432,6 +433,7 @@ def scoreToPianoroll(score_path, quantization):
     return pianoroll, articulation
 
 if __name__ == '__main__':
-    score_path = "test.xml"
+#    score_path = "/Users/leo/Recherche/GitHub_Aciditeam/database/Arrangement/Fetch_IKM/OpenMusicScores/Bach, Johann Sebastian/15 Inventions_Invention 1/Invention 1.xml"
+    score_path = "/Users/leo/Recherche/GitHub_Aciditeam/database/Arrangement/Fetch_IKM/OpenMusicScores/Bach, Johann Sebastian/Brandenburg Concerto No. 2  BWV 1047 - Bach, Johann Sebastian_JSB_BWV1047_1/JSB_BWV1047_1.xml"
     quantization = 8
     pianoroll, articulation = scoreToPianoroll(score_path, quantization)
