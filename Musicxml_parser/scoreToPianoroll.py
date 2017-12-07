@@ -399,7 +399,7 @@ def pre_process_file(file_path, tmp_name='jsodfijosid.xml'):
     return temp_file_path
 
     
-def ScoreToPianoroll(score_path, quantization):
+def scoreToPianoroll(score_path, quantization):
     # Remove DOCTYPE
     tmp_file_path = pre_process_file(score_path)
     
@@ -434,4 +434,4 @@ def ScoreToPianoroll(score_path, quantization):
 if __name__ == '__main__':
     score_path = "test.xml"
     quantization = 8
-    pianoroll, articulation = ScoreToPianoroll(score_path, quantization)
+    pianoroll, articulation = scoreToPianoroll(score_path, quantization)
