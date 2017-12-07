@@ -43,7 +43,7 @@ class TotalLengthHandler(xml.sax.ContentHandler):
                 raise NameError('All parts have not the same length')
             else:
                 # Add a 1 at the end to allow the last note to stop
-                self.total_length = self.total_length_list[1] + 1
+                self.total_length = self.total_length_list[0] + 1
 
     def characters(self, content):
         if content.strip():
