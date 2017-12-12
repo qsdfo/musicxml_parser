@@ -298,7 +298,7 @@ class ScoreToPianorollHandler(xml.sax.ContentHandler):
             
         if tag == u'part-name':
             this_instru_name = self.content
-            print (u"@@ " + self.content + u"   :   " + this_instru_name).encode('utf8')
+            # print (u"@@ " + self.content + u"   :   " + this_instru_name).encode('utf8')
             self.content = u""
             self.part_instru_mapping[self.identifier] = this_instru_name
 
