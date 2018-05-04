@@ -69,6 +69,6 @@ if __name__ == "__main__":
     if(os.path.isfile("BeetAnGeSample.xml")):
         parser.parse("BeetAnGeSample.xml")
     else:
-        print "Not a file"
+        print("Not a file")
 
-    print Handler.total_length
+    print(Handler.total_length)

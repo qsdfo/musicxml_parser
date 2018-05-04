@@ -20,8 +20,8 @@ import xml.sax
 import re
 import os
 import tempfile
-from smooth_dynamic import smooth_dyn
-from totalLengthHandler import TotalLengthHandler
+from Musicxml_parser.smooth_dynamic import smooth_dyn
+from Musicxml_parser.totalLengthHandler import TotalLengthHandler
 
 mapping_step_midi = {
     'C': 0,
@@ -224,7 +224,7 @@ class ScoreToPianorollHandler(xml.sax.ContentHandler):
             if not_a_rest and not_a_grace and note_played:
                 # Check file integrity
                 if not self.pitch_set:
-                    print "XML misformed, a Pitch tag is missing"
+                    print("XML misformed, a Pitch tag is missing")
                     return
                 # Start and end time for the note
                 start_time = int(self.time * self.division_pianoroll / self.division_score)
@@ -298,7 +298,7 @@ class ScoreToPianorollHandler(xml.sax.ContentHandler):
             
         if tag == u'part-name':
             this_instru_name = self.content
-            # print (u"@@ " + self.content + u"   :   " + this_instru_name).encode('utf8')
+            # print((u"@@ " + self.content + u"   :   " + this_instru_name).encode('utf8'))
             self.content = u""
             self.part_instru_mapping[self.identifier] = this_instru_name
 
