@@ -386,10 +386,10 @@ def pre_process_file(file_path):
     
     """
 
-    temp_file = tempfile.NamedTemporaryFile('wb',suffix='.xml', prefix='tmp', delete=False)
+    temp_file = tempfile.NamedTemporaryFile('w', suffix='.xml', prefix='tmp', delete=False, encoding='utf-8')
     
     # Remove the doctype line
-    with open(file_path, 'rb') as fread:
+    with open(file_path, 'r', encoding="utf-8") as fread:
         for line in fread:
             if not re.search(r'<!DOCTYPE', line):
                 temp_file.write(line)                
@@ -403,7 +403,7 @@ def pre_process_file(file_path):
 def scoreToPianoroll(score_path, quantization):
     # Remove DOCTYPE
     tmp_file_path = pre_process_file(score_path)
-    
+
     # Get the total length in quarter notes of the track
     pre_parser = xml.sax.make_parser()
     pre_parser.setFeature(xml.sax.handler.feature_namespaces, 0)
@@ -424,16 +424,15 @@ def scoreToPianoroll(score_path, quantization):
     # Using Mapping, build concatenated along time and pitch pianoroll
     pianoroll = {}
     articulation = {}
-    for instru_name, mat in Handler_score.pianoroll.iteritems():
+    for instru_name, mat in Handler_score.pianoroll.items():
         pianoroll[instru_name] = mat
-    for instru_name, mat in Handler_score.articulation.iteritems():
+    for instru_name, mat in Handler_score.articulation.items():
         articulation[instru_name] = mat
     
     os.remove(tmp_file_path)
     return pianoroll, articulation
 
 if __name__ == '__main__':
-#    score_path = "/Users/leo/Recherche/GitHub_Aciditeam/database/Arrangement/Fetch_IKM/OpenMusicScores/Bach, Johann Sebastian/15 Inventions_Invention 1/Invention 1.xml"
-    score_path = "/Users/leo/Recherche/GitHub_Aciditeam/database/Arrangement/Fetch_IKM/OpenMusicScores/Bach, Johann Sebastian/Brandenburg Concerto No. 2  BWV 1047 - Bach, Johann Sebastian_JSB_BWV1047_1/JSB_BWV1047_1.xml"
+    score_path = "/Users/leo/Recherche/GitHub_Aciditeam/database/Arrangement/SOD/OpenMusicScores/0/Belle qui tiens ma vie   - Arbeau, Toinot .xml"
     quantization = 8
     pianoroll, articulation = scoreToPianoroll(score_path, quantization)
