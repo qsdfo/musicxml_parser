@@ -347,7 +347,11 @@ class ScoreToPianorollHandler(xml.sax.ContentHandler):
                 self.octave = int(content)
                 self.octave_set = True
             if self.CurrentElement == u"alter":
-                self.alter = int(content)
+                if content == '-':
+                    self.alter = -1
+                    print("Alter problem")
+                else:     
+                    self.alter = int(content)
             if self.CurrentElement == u"voice":
                 self.current_voice = content
                 self.voice_set = True
@@ -425,7 +429,7 @@ def scoreToPianoroll(score_path, quantization):
     pianoroll = {}
     articulation = {}
     for instru_name, mat in Handler_score.pianoroll.items():
-        pianoroll[instru_name] = mat
+        pianoroll[instru_name] = (mat*128).astype(int)
     for instru_name, mat in Handler_score.articulation.items():
         articulation[instru_name] = mat
     
