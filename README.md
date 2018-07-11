@@ -21,9 +21,7 @@ Given an mxml file, outputs three dictionaries indexed by instruments names. For
 Written in python 2.7
 
 ## Packages dependencies :
-* xml.sax
-* Numpy
-* os, re, json, sys
+* numpy
 
 ## Files
 The main function is ScoreToPianoroll in ScoreToPianoroll.py
