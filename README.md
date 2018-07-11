@@ -1,5 +1,16 @@
 # MusicXML parser
 
+## Installation
+
+    pip install musicxml_parser
+
+## Usage
+
+    from musicxml_parser.scoreToPianoroll import scoreToPianoroll
+    score_path = "test.xml"
+    quantization = 16
+    pianoroll, articulation = scoreToPianoroll(score_path, quantization)
+
 ## Description :
 Music XML parser written in Python based on a SAX analyzer.
 Given an mxml file, outputs three dictionaries indexed by instruments names. For each instrument, three Numpy arrays are created :
