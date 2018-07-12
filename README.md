@@ -18,8 +18,6 @@ Given an mxml file, outputs three dictionaries indexed by instruments names. For
 - a binary articulation which is the same matrix as the pianoroll but with shorter duration so that we can distinguish between a long note or several repeated occurences of the same note. Hence, if a quarter note lasted 4 frames in the pianoroll it would be 3 in the articulation. Staccati notes are 1 whatever their duration.
 - a dynamic vector which indicate the evolution of the dynamic for this instrument along time
 
-Written in python 2.7
-
 ## Packages dependencies :
 * numpy
 
